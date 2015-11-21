@@ -12,8 +12,8 @@ fn main() {
     remote_path maybe: /x/y/z
 
     changed_file_path maybe: /a/b/c/d
-    relative path = /a/b/c/d/e/f - /a/b/c = /d
-    so target remote path = /x/y/z + /d/e/f = /x/y/z/d
+    relative path = /a/b/c/d - /a/b/c = /d
+    so target remote path = /x/y/z + /d = /x/y/z/d
     */
 
     let args: Vec<_> = env::args().collect();
