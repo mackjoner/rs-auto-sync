@@ -1,0 +1,7 @@
+[package]
+name = "rs-auto-sync"
+version = "0.1.0"
+authors = ["dbbbit <dbbbit@gmail.com>"]
+
+[dependencies]
+fsevent = "0.2.11"
