@@ -24,6 +24,10 @@ fn main() {
 
     let mut local_path = args[1].clone();
     let mut remote_path = args[2].clone();
+    if local_path.starts_with(".") {
+        println!("plz rewrite local_path start_with ~ or \\");
+        return;
+    }
     local_path = local_path.trim_right_matches('/').to_string();
     remote_path = remote_path.trim_right_matches('/').to_string();
 
