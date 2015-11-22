@@ -2,6 +2,12 @@
 name = "rs-auto-sync"
 version = "0.1.0"
 authors = ["dbbbit <dbbbit@gmail.com>"]
+description = "auto rsync when files change"
+repository = "https://github.com/dbbbit/rs-auto-sync"
+homepage = "https://github.com/dbbbit/rs-auto-sync"
+keywords = ["rsync", "auto-sync"]
+license = "MIT"
+readme = "README.md"
 
 [dependencies]
 fsevent = "0.2.11"
