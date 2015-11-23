@@ -48,10 +48,7 @@ fn main() {
         }
         let event = result.unwrap();
         println!(">>> {:?}", event);
-        //ignore hide file or dir
-        if !event.path.find("/.").is_none() {
-            continue;
-        }
+
         let local_relative_path;
         unsafe {
             local_relative_path = event.path.slice_unchecked(
@@ -61,7 +58,7 @@ fn main() {
         }
 
         let target_remote_path = remote_path.clone() + &local_relative_path;
-        let options = vec!["-r", "-v"];
+        let options = vec!["-r", "-v", "--exclude=.[a-zA-Z0-9]*"];
         let output = Command::new("rsync")
             .args(&options)
             .arg(&event.path)
