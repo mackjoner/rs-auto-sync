@@ -3,18 +3,10 @@ extern crate fsevent;
 use std::thread;
 use std::sync::mpsc::channel;
 use std::process::Command;
+use std::path::Path;
 use std::env;
 
 fn main() {
-
-    /*
-    local_path such as: /a/b/c
-    remote_path maybe: /x/y/z
-
-    changed_file_path maybe: /a/b/c/d
-    relative path = /a/b/c/d - /a/b/c = /d
-    so target remote path = /x/y/z + /d = /x/y/z/d
-    */
 
     let args: Vec<_> = env::args().collect();
     if args.len() != 3 {
@@ -22,21 +14,20 @@ fn main() {
         return;
     }
 
-    let mut local_path = args[1].clone();
-    let mut remote_path = args[2].clone();
-    if !local_path.starts_with("~") && !local_path.starts_with("/"){
-        println!("plz rewrite local_path start_with ~ or /");
+    let local_path_string = args[1].clone();
+    let remote_path_string = args[2].clone();
+    let local_path = Path::new(&local_path_string);
+
+    if !local_path.starts_with("/") {
+        println!("plz rewrite local_path as absolute path");
         return;
     }
-    local_path = local_path.trim_right_matches('/').to_string();
-    remote_path = remote_path.trim_right_matches('/').to_string();
 
     //watch fs event
     let (event_tx, event_rx) = channel();
-    let watch_path = local_path.clone();
     thread::spawn(move || {
         let fsevent = fsevent::FsEvent::new(event_tx);
-        fsevent.append_path(&watch_path);
+        fsevent.append_path(&args[1]);
         fsevent.observe();
     });
 
@@ -49,15 +40,13 @@ fn main() {
         let event = result.unwrap();
         println!(">>> {:?}", event);
 
-        let local_relative_path;
-        unsafe {
-            local_relative_path = event.path.slice_unchecked(
-                local_path.len(),
-                event.path.len()
-            ).to_string();
-        }
+        let event_path = Path::new(&event.path);
+        let parent_event_path = event_path.parent().unwrap();
+        let parent_local_path = local_path.parent().unwrap();
+        let target_remote_path = parent_event_path
+            .to_str().unwrap()
+            .replace(parent_local_path.to_str().unwrap(), &remote_path_string);
 
-        let target_remote_path = remote_path.clone() + &local_relative_path;
         let options = vec!["-r", "-v", "--exclude=.[a-zA-Z0-9]*"];
         let output = Command::new("rsync")
             .args(&options)
@@ -67,7 +56,6 @@ fn main() {
             .unwrap_or_else(|e| {
                 panic!("failed to execute process: {}", e)
             });
-
         if output.stdout.len() > 0 {
             println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
         }
