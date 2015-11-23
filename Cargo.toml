@@ -1,6 +1,6 @@
 [package]
 name = "rs-auto-sync"
-version = "0.1.0"
+version = "0.1.2"
 authors = ["dbbbit <dbbbit@gmail.com>"]
 description = "auto rsync when files change"
 repository = "https://github.com/dbbbit/rs-auto-sync"
