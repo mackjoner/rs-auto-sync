@@ -23,6 +23,8 @@ fn main() {
         return;
     }
 
+    rsync(&local_path_string, &remote_path_string);
+
     //watch fs event
     let (event_tx, event_rx) = channel();
     thread::spawn(move || {
@@ -38,7 +40,18 @@ fn main() {
             continue;
         }
         let event = result.unwrap();
-        println!(">>> {:?}", event);
+        // ignore hiden files
+        if !event.path.find("/.").is_none() {
+            continue;
+        }
+
+        println!("{:?}", event);
+
+        if event.flag.contains(fsevent::ITEM_REMOVED) ||
+            event.flag.contains(fsevent::ITEM_RENAMED) {
+            rsync(&local_path_string, &remote_path_string);
+            continue;
+        }
 
         let event_path = Path::new(&event.path);
         let parent_event_path = event_path.parent().unwrap();
@@ -46,21 +59,26 @@ fn main() {
         let target_remote_path = parent_event_path
             .to_str().unwrap()
             .replace(parent_local_path.to_str().unwrap(), &remote_path_string);
+        rsync(&event.path, &target_remote_path);
+    }
+}
 
-        let options = vec!["-r", "-v", "--exclude=.[a-zA-Z0-9]*"];
-        let output = Command::new("rsync")
-            .args(&options)
-            .arg(&event.path)
-            .arg(&target_remote_path)
-            .output()
-            .unwrap_or_else(|e| {
-                panic!("failed to execute process: {}", e)
-            });
-        if output.stdout.len() > 0 {
-            println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        }
-        if output.stderr.len() > 0 {
-            println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
-        }
+
+fn rsync (source :&str, target :&str) {
+    println!(">> rsync {} {}", source, target);
+    let options = vec!["-r", "-v", "--exclude=.[a-zA-Z0-9]*", "--delete"];
+    let output = Command::new("rsync")
+        .args(&options)
+        .arg(source)
+        .arg(target)
+        .output()
+        .unwrap_or_else(|e| {
+            panic!("failed to execute process: {}", e)
+        });
+    if output.stdout.len() > 0 {
+        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+    }
+    if output.stderr.len() > 0 {
+        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     }
 }
