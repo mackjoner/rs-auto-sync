@@ -66,7 +66,12 @@ fn main() {
 
 fn rsync (source :&str, target :&str) {
     println!(">> rsync {} {}", source, target);
-    let options = vec!["-r", "-v", "--exclude=.[a-zA-Z0-9]*", "--delete"];
+    let options = vec![
+        "-r",
+        "-v",
+        "--exclude=.[a-zA-Z0-9]*",
+        "--filter=:- .gitignore",
+        "--delete"];
     let output = Command::new("rsync")
         .args(&options)
         .arg(source)
