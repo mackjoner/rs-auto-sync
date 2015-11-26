@@ -10,4 +10,4 @@ license = "MIT"
 readme = "README.md"
 
 [dependencies]
-fsevent = "0.2.11"
+fsevent = "0.2.12"

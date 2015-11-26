@@ -1,8 +1,8 @@
 [root]
 name = "rs-auto-sync"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
- "fsevent 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
+ "fsevent 0.2.12 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -12,7 +12,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "fsevent"
-version = "0.2.11"
+version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bitflags 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
